@@ -54,15 +54,15 @@
           <div class="row">
             <div class="col-12 border border-dark py-3">
               <h3 class="font-weight-bold">
-                <span id="cityName">City Name Here</span
-                ><i id="weatherIcon"></i>
+                <span id="cityName"></span> (<span id="currentDate"></span>)
+                <i id="weatherIcon"></i>
               </h3>
               <br />
-              <h4>Temp: <span id="temp"></span></h4>
+              <h4>Temp: <span id="temp"></span> F</h4>
               <br />
-              <h4>Wind: <span id="wind"></span></h4>
+              <h4>Wind: <span id="wind"></span> MPH</h4>
               <br />
-              <h4>Humidity: <span id="humidity"></span></h4>
+              <h4>Humidity: <span id="humidity"></span> %</h4>
               <br />
               <h4>UV Index: <span id="uv"></span></h4>
               <br />
@@ -73,8 +73,7 @@
             <div class="card-deck">
               <div class="card bg-dark text-light">
                 <div class="card-body">
-                  <p class="card-title"></p>
-                  <p class="card-text">
+                  <p class="card-text" id="card1">
                     This is a longer card with supporting text below as a
                     natural lead-in to additional content. This content is a
                     little bit longer.

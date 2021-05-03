@@ -4,7 +4,32 @@ const submitBtn = document.querySelector("#submit");
 const historyCol = document.querySelector("#btnHistory");
 let searchHistory = [];
 
+const dateEl = document.querySelector("#currentDate");
+const cityEl = document.querySelector("#cityName");
+const iconEl = document.querySelector("#weatherIcon");
+const tempEl = document.querySelector("#temp");
+const windEl = document.querySelector("#wind");
+const humidEl = document.querySelector("#humidity");
+const uvEl = document.querySelector("#uv");
+
+const forcastCardsEL = [
+  document.querySelector("#card1"),
+  document.querySelector("#card2"),
+  document.querySelector("#card3"),
+  document.querySelector("#card4"),
+  document.querySelector("#card5"),
+];
 //Functions
+//Parse Date
+const parseDate = function (timestamp) {
+  var a = new Date(timestamp * 1000);
+
+  var year = a.getFullYear();
+  var month = a.getMonth();
+  var date = a.getDate();
+  var time = month + "/" + date + "/" + year;
+  return time;
+};
 
 //Add buttons to the History div
 
@@ -17,6 +42,21 @@ const createBtn = function (name) {
   historyCol.appendChild(histBtn);
 };
 
+const createCard = function (dailyforcast, i) {
+  let date = document.createElement("span");
+  let icon = document.createElement("span");
+  let temp = document.createElement("span");
+  let wind = document.createElement("span");
+  let humidity = document.createElement("span");
+  date.textContent = parseDate(dailyforcast.dt);
+  temp.textContent = dailyforcast.temp;
+  wind.textContent = dailyforcast.wind_speed;
+  humidity.textContent = dailyforcast.humidity;
+  forcastCardsEL[i].appendChild(date);
+  forcastCardsEL[i].appendChild(temp);
+  forcastCardsEL[i].appendChild(wind);
+  forcastCardsEL[i].appendChild(humidity);
+};
 //Add search term to local storage
 
 const addHist = function (string) {
@@ -43,32 +83,59 @@ const loadHist = function () {
   }
 };
 //get coordinates of city
-const getCoord = function (city) {
+const getCoord = async function (city) {
   fetch(
     "http://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
       city
   )
     .then((response) => response.json())
     .then((data) => {
+      console.log(data);
       let Coords = data.results[0].locations[0].latLng;
-      console.log(Coords);
+      let location = data.results[0].locations[0].adminArea5;
+      return Coords;
     });
 };
 
+//populate current weather
+const currentWeather = function (data) {
+  let currentTemp = data.current.temp;
+  let currentWind = data.current.wind_speed;
+  let currentHumidity = data.current.humidity;
+  let currentUV = data.current.uvi;
+  let currentDate = parseDate(data.current.dt);
+  tempEl.textContent = currentTemp;
+  windEl.textContent = currentWind;
+  humidEl.textContent = currentHumidity;
+  uvEl.textContent = currentUV;
+  dateEl.textContent = currentDate;
+};
+const forcast = function (data) {
+  let dailyforcast = data.daily;
+  console.log(dailyforcast);
+  for (i = 0; i < forcastCardsEL.length; i++) {
+    createCard(dailyforcast, i);
+  }
+};
 //set default to austin
-const defaultCity = function () {
+const defaultCity = async function () {
   fetch(
-    "https://api.openweathermap.org/data/2.5/onecall?lat=30.264979&lon=-97.746598&appid=573f2c5e966ec3f3c6f537b660a3b8c5&exclude=hourly,minutely"
+    "https://api.openweathermap.org/data/2.5/onecall?lat=30.264979&lon=-97.746598&appid=573f2c5e966ec3f3c6f537b660a3b8c5&exclude=hourly,minutely&units=imperial"
   )
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-
+      currentWeather(data);
+      cityEl.textContent = "Austin";
+      //   forcast(data);
       //populate weather sections
     });
 };
-//populate current weather
-const currentWeather = function (data) {};
+
+//Searched city
+const getCity = async function (cityQuery) {
+  var coords = await getCoord(cityQuery);
+};
 
 //get form input
 
@@ -78,7 +145,8 @@ submitBtn.addEventListener("click", (e) => {
   let cityQuery = cityInput.value;
   //   console.log(cityQuery);
   //add to history
-  getCoord(cityQuery);
+  //   getCoord(cityQuery);
+  getCity(cityQuery);
   addHist(cityQuery);
   createBtn(cityQuery);
 });
