@@ -55,7 +55,7 @@ const createCard = async function (dailyforcast, card) {
     date.innerHTML = "<h4>" + parseDate(dailyforcast.dt) + "</h4>";
     icon.setAttribute(
       "src",
-      "http://openweathermap.org/img/wn/" +
+      "https://openweathermap.org/img/wn/" +
         dailyforcast.weather[0].icon +
         "@2x.png"
     );
@@ -111,17 +111,17 @@ const loadHist = function () {
 //get coordinates of city
 const getCoord = async function (city) {
   fetch(
-    "http://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
+    "https://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
       city
   )
     .then((response) => response.json())
     .then((data) => {
-      //   console.log(data);
+      console.log(data);
       let lat = data.results[0].locations[0].latLng.lat;
       let lng = data.results[0].locations[0].latLng.lng;
       let cityName = data.results[0].locations[0].adminArea5;
       let locationData = [lat, lng, cityName];
-      //   console.log(locationData);
+      console.log(locationData);
       return locationData;
     });
 };
@@ -136,7 +136,7 @@ const currentWeather = function (data) {
   let currentIcon = data.current.weather[0].icon;
   iconEl.setAttribute(
     "src",
-    "http://openweathermap.org/img/wn/" + currentIcon + "@2x.png"
+    "https://openweathermap.org/img/wn/" + currentIcon + "@2x.png"
   );
   tempEl.textContent = currentTemp;
   windEl.textContent = currentWind;
@@ -174,12 +174,12 @@ const defaultCity = async function () {
 
 const City = async function (cityQuery) {
   fetch(
-    "http://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
+    "https://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
       cityQuery
   )
     .then((response) => response.json())
     .then((data) => {
-      //   console.log(data);
+      console.log(data);
       let lat = data.results[0].locations[0].latLng.lat;
       let lng = data.results[0].locations[0].latLng.lng;
       let cityName = data.results[0].locations[0].adminArea5;
@@ -211,6 +211,7 @@ submitBtn.addEventListener("click", (e) => {
   //add to history
   //   getCoord(cityQuery);
   if (cityQuery) {
+    console.log(cityQuery);
     City(cityQuery);
     addHist(cityQuery);
   }
