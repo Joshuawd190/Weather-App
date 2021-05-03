@@ -6,10 +6,9 @@ A weather forcast app
 
 This is a small project created to help learn fetch api calls
 
-
 ## Screenshot
 
-![A screenshot of the web page](./assets/images/joshuawd190.github.io_Weather-App_ (1).png)
+![A screenshot of the web page](assets\images\joshuawd190.github.io*Weather-App* (1).png)
 
 ## Link to Deployed Website
 
