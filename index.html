@@ -18,18 +18,31 @@
     <div class="container-fluid m-auto">
       <div class="row">
         <div class="col-12">
-          <h1 class="text-center text-light bg-dark">Weather Dashboard</h1>
+          <h1 class="text-center text-light bg-dark py-2">Weather Dashboard</h1>
         </div>
       </div>
 
       <div class="row m-auto">
-        <div class="col-3 bg-dark h-100">
-          <h1>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et
-            reiciendis voluptatibus, cumque cupiditate quae quasi accusamus,
-            ullam earum aperiam ipsam non, ducimus architecto. Voluptas,
-            aliquid? Vel reprehenderit doloribus voluptatem consequatur.
-          </h1>
+        <div class="col-3 h-100">
+          <form>
+            <div class="form-group">
+              <h2>
+                <label for="cityInput">Search for a City:</label>
+              </h2>
+
+              <input
+                type="search"
+                class="form-control"
+                id="cityInput"
+                placeholder="Austin"
+              />
+              <button type="submit" class="btn btn-primary w-100 my-3">
+                Submit
+              </button>
+            </div>
+          </form>
+          <hr />
+          <div>buttons go here</div>
         </div>
         <div class="col-9 bg-primary h-50">
           <div class="row">
