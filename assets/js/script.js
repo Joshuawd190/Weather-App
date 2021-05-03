@@ -44,17 +44,26 @@ const createBtn = function (name) {
 
 const createCard = async function (dailyforcast, card) {
   try {
+    while (card.hasChildNodes()) {
+      card.removeChild(card.firstChild);
+    }
     let date = document.createElement("p");
-    let icon = document.createElement("p");
+    let icon = document.createElement("img");
     let temp = document.createElement("p");
     let wind = document.createElement("p");
     let humidity = document.createElement("p");
-    date.textContent = parseDate(dailyforcast.dt);
-    console.log(date);
-    temp.textContent = dailyforcast.temp.max;
-    wind.textContent = dailyforcast.wind_speed;
-    humidity.textContent = dailyforcast.humidity;
+    date.innerHTML = "<h4>" + parseDate(dailyforcast.dt) + "</h4>";
+    icon.setAttribute(
+      "src",
+      "http://openweathermap.org/img/wn/" +
+        dailyforcast.weather[0].icon +
+        "@2x.png"
+    );
+    temp.textContent = "Temp: " + dailyforcast.temp.max;
+    wind.textContent = "Wind: " + dailyforcast.wind_speed;
+    humidity.textContent = "Humidity: " + dailyforcast.humidity;
     card.appendChild(date);
+    card.appendChild(icon);
     card.appendChild(temp);
     card.appendChild(wind);
     card.appendChild(humidity);
@@ -63,13 +72,20 @@ const createCard = async function (dailyforcast, card) {
   }
 };
 //Add search term to local storage
+const cityFormatter = function (string) {
+  let firstchar = string.charAt(0);
+  let upChar = firstchar.toUpperCase();
+  string = string.replace(firstchar, upChar);
+  return string;
+};
 
 const addHist = function (string) {
   index = searchHistory.length;
   //   console.log(index);
+  string = cityFormatter(string);
   if (!searchHistory.includes(string)) {
     console.log("It's a go");
-    searchHistory[index] = string;
+    searchHistory[index] = string.trim();
     window.localStorage.setItem("history", JSON.stringify(searchHistory));
     createBtn(string);
   }
@@ -100,9 +116,13 @@ const getCoord = async function (city) {
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
-      let Coords = data.results[0].locations[0].latLng;
-      let location = data.results[0].locations[0].adminArea5;
+      //   console.log(data);
+      let lat = data.results[0].locations[0].latLng.lat;
+      let lng = data.results[0].locations[0].latLng.lng;
+      let cityName = data.results[0].locations[0].adminArea5;
+      let locationData = [lat, lng, cityName];
+      //   console.log(locationData);
+      return locationData;
     });
 };
 
@@ -113,6 +133,11 @@ const currentWeather = function (data) {
   let currentHumidity = data.current.humidity;
   let currentUV = data.current.uvi;
   let currentDate = parseDate(data.current.dt);
+  let currentIcon = data.current.weather[0].icon;
+  iconEl.setAttribute(
+    "src",
+    "http://openweathermap.org/img/wn/" + currentIcon + "@2x.png"
+  );
   tempEl.textContent = currentTemp;
   windEl.textContent = currentWind;
   humidEl.textContent = currentHumidity;
@@ -122,7 +147,7 @@ const currentWeather = function (data) {
 const forcast = async function (data) {
   try {
     let dailyforcast = await data.daily;
-    console.log(dailyforcast);
+    // console.log(dailyforcast);
     await createCard(dailyforcast[0], day1);
     await createCard(dailyforcast[1], day2);
     await createCard(dailyforcast[2], day3);
@@ -139,7 +164,7 @@ const defaultCity = async function () {
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
+      //   console.log(data);
       currentWeather(data);
       cityEl.textContent = "Austin";
       forcast(data);
@@ -147,9 +172,33 @@ const defaultCity = async function () {
     });
 };
 
-//Searched city
-const getCity = async function (cityQuery) {
-  return getCoord(cityQuery);
+const City = async function (cityQuery) {
+  fetch(
+    "http://www.mapquestapi.com/geocoding/v1/address?key=vNG3wlvynBldbZXBB1ct6CZGK1y1nhBf&maxResults=1&location=" +
+      cityQuery
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      //   console.log(data);
+      let lat = data.results[0].locations[0].latLng.lat;
+      let lng = data.results[0].locations[0].latLng.lng;
+      let cityName = data.results[0].locations[0].adminArea5;
+      fetch(
+        "https://api.openweathermap.org/data/2.5/onecall?lat=" +
+          lat +
+          "&lon=" +
+          lng +
+          "&appid=573f2c5e966ec3f3c6f537b660a3b8c5&exclude=hourly,minutely&units=imperial"
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          currentWeather(data);
+          cityEl.textContent = cityName;
+          forcast(data);
+          //populate weather sections
+        });
+    });
 };
 
 //get form input
@@ -161,19 +210,22 @@ submitBtn.addEventListener("click", (e) => {
   //   console.log(cityQuery);
   //add to history
   //   getCoord(cityQuery);
-  getCity(cityQuery).then();
-  addHist(cityQuery);
+  if (cityQuery) {
+    City(cityQuery);
+    addHist(cityQuery);
+  }
   //   createBtn(cityQuery);
 });
 
 historyCol.addEventListener("click", (e) => {
   e.preventDefault();
   let city = e.target.textContent;
-  getCoord(city);
+  City(city);
   //   console.log(city);
 });
 loadHist();
 defaultCity();
+
 //fetch info from api
 //generate content from info
 //check clicks on history and re fetch
